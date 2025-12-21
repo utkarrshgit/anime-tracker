@@ -1,25 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import animeMock from "../data/animeMock";
 import AnimeCard from "../components/AnimeCard";
 
 function AnimeList() {
-    const [query, setQuery] = useState("");
-		const [selectedGenres, setSelectedGenres] = useState([]);
+  const [query, setQuery] = useState("");
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  
+  const [watchlist, setWatchlist] = useState(() => {
+    const saved = localStorage.getItem("watchlist");
+    return saved ? JSON.parse(saved) : [];
+  })
 
-		const genres = [...new Set(animeMock.flatMap(a => a.genres))];
+  useEffect(() => {
+    localStorage.setItem("watchlist", JSON.stringify(watchlist));
+  }, [watchlist])
 
-    const filteredAnime = animeMock.filter((anime) => {
-			const matchesTitle = anime.title
-        .toLowerCase()
-        .includes(query.toLowerCase());
-			
-			const matchesGenre = 
-				selectedGenres.length === 0 ||
-				selectedGenres.some((g) => anime.genres.includes(g))
+  const genres = [...new Set(animeMock.flatMap(a => a.genres))];
 
-			return matchesTitle && matchesGenre;
-		}
+  const filteredAnime = animeMock.filter((anime) => {
+    const matchesTitle = anime.title
+      .toLowerCase()
+      .includes(query.toLowerCase());
+    
+    const matchesGenre = 
+      selectedGenres.length === 0 ||
+      selectedGenres.some((g) => anime.genres.includes(g))
+
+    return matchesTitle && matchesGenre;
+  });
+
+  const toggleWatchlist = (id) => {
+    setWatchlist((prev) => 
+      prev.includes(id)
+        ? prev.filter((itemId) => itemId !== id)
+        : [...prev, id]
     );
+  };
 
   return (
     <div style={{ padding: 20 }}>
@@ -56,7 +72,12 @@ function AnimeList() {
 
       <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
         {filteredAnime.map((anime) => (
-          <AnimeCard key={anime.id} anime={anime} />
+          <AnimeCard
+            key={anime.id}
+            anime={anime}
+            isInWatchlist={watchlist.includes(anime.id)}
+            onToggle={toggleWatchlist}
+          />
         ))}
       </div>
     </div>
