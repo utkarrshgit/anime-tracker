@@ -5,37 +5,44 @@ import AnimeCard from "../components/AnimeCard";
 function AnimeList() {
   const [query, setQuery] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
-  
+  const [showWatchlistOnly, setShowWatchlistOnly] = useState(false);
+
+  // WATCHLIST STATE (IDs only)
   const [watchlist, setWatchlist] = useState(() => {
     const saved = localStorage.getItem("watchlist");
     return saved ? JSON.parse(saved) : [];
-  })
+  });
 
+  // sync watchlist to localStorage
   useEffect(() => {
     localStorage.setItem("watchlist", JSON.stringify(watchlist));
-  }, [watchlist])
+  }, [watchlist]);
 
-  const genres = [...new Set(animeMock.flatMap(a => a.genres))];
+  // unique genres
+  const genres = [...new Set(animeMock.flatMap((a) => a.genres))];
 
+  // toggle watchlist handler
+  const toggleWatchlist = (id) => {
+    setWatchlist((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    );
+  };
+
+  // filtering logic
   const filteredAnime = animeMock.filter((anime) => {
     const matchesTitle = anime.title
       .toLowerCase()
       .includes(query.toLowerCase());
-    
-    const matchesGenre = 
+
+    const matchesGenre =
       selectedGenres.length === 0 ||
-      selectedGenres.some((g) => anime.genres.includes(g))
+      selectedGenres.some((g) => anime.genres.includes(g));
 
-    return matchesTitle && matchesGenre;
+    const matchWatchlist = 
+      !showWatchlistOnly || watchlist.includes(anime.id);
+
+    return matchesTitle && matchesGenre && matchWatchlist;
   });
-
-  const toggleWatchlist = (id) => {
-    setWatchlist((prev) => 
-      prev.includes(id)
-        ? prev.filter((itemId) => itemId !== id)
-        : [...prev, id]
-    );
-  };
 
   return (
     <div style={{ padding: 20 }}>
@@ -50,26 +57,35 @@ function AnimeList() {
 
       {/* Genre checkboxes */}
       <div style={{ marginBottom: 16 }}>
-				{genres.map((g) => (
-					<label key={g} style={{ marginRight: 12 }}>
-						<input 
-							type="checkbox"
-							checked={selectedGenres.includes(g)}
-							onChange={(e) => {
-								if (e.target.checked) {
+        {genres.map((g) => (
+          <label key={g} style={{ marginRight: 12 }}>
+            <input
+              type="checkbox"
+              checked={selectedGenres.includes(g)}
+              onChange={(e) => {
+                if (e.target.checked) {
                   setSelectedGenres([...selectedGenres, g]);
                 } else {
                   setSelectedGenres(
                     selectedGenres.filter((genre) => genre !== g)
                   );
-								}
-							}}
-						/>{" "}
-						{g}
-					</label>
-				))}
-			</div>
+                }
+              }}
+            />{" "}
+            {g}
+          </label>
+        ))}
+      </div>
 
+      {/* Watchlist toggle */}
+      <button
+        onClick={() => setShowWatchlistOnly((prev) => !prev)}
+        style={{ padding: 8, marginBottom: 16 }}
+      >
+        {showWatchlistOnly ? "Show all" : "Show Watchlist"}
+      </button>
+
+      {/* Anime list */}
       <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
         {filteredAnime.map((anime) => (
           <AnimeCard
