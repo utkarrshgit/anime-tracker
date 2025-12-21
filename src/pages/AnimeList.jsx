@@ -4,9 +4,9 @@ import AnimeCard from "../components/AnimeCard";
 
 function AnimeList() {
     const [query, setQuery] = useState("");
-		const [genre, setGenre] = useState("All");
+		const [selectedGenres, setSelectedGenres] = useState([]);
 
-		const genres = ["All", ...new Set(animeMock.flatMap(a => a.genres))];
+		const genres = [...new Set(animeMock.flatMap(a => a.genres))];
 
     const filteredAnime = animeMock.filter((anime) => {
 			const matchesTitle = anime.title
@@ -14,7 +14,8 @@ function AnimeList() {
         .includes(query.toLowerCase());
 			
 			const matchesGenre = 
-				genre === "All" || anime.genres.includes(genre);
+				selectedGenres.length === 0 ||
+				selectedGenres.some((g) => anime.genres.includes(g))
 
 			return matchesTitle && matchesGenre;
 		}
@@ -22,6 +23,7 @@ function AnimeList() {
 
   return (
     <div style={{ padding: 20 }}>
+      {/* Search */}
       <input
         type="text"
         placeholder="Search"
@@ -30,17 +32,27 @@ function AnimeList() {
         style={{ padding: 8, marginBottom: 16, width: 240 }}
       />
 
-      <select
-        value={genre}
-        onChange={(e) => setGenre(e.target.value)}
-        style={{ padding: 8 }}
-      >
+      {/* Genre checkboxes */}
+      <div style={{ marginBottom: 16 }}>
 				{genres.map((g) => (
-					<option key={g} value={g}>
+					<label key={g} style={{ marginRight: 12 }}>
+						<input 
+							type="checkbox"
+							checked={selectedGenres.includes(g)}
+							onChange={(e) => {
+								if (e.target.checked) {
+                  setSelectedGenres([...selectedGenres, g]);
+                } else {
+                  setSelectedGenres(
+                    selectedGenres.filter((genre) => genre !== g)
+                  );
+								}
+							}}
+						/>{" "}
 						{g}
-					</option>
+					</label>
 				))}
-			</select>
+			</div>
 
       <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
         {filteredAnime.map((anime) => (
