@@ -1,34 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import animeMock from "../data/animeMock";
 import AnimeCard from "../components/AnimeCard";
+import { useWatchlist } from "../context/WatchlistContext";
 
 function AnimeList() {
   const [query, setQuery] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [showWatchlistOnly, setShowWatchlistOnly] = useState(false);
 
-  // WATCHLIST STATE (IDs only)
-  const [watchlist, setWatchlist] = useState(() => {
-    const saved = localStorage.getItem("watchlist");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { watchlist } = useWatchlist();
 
-  // sync watchlist to localStorage
-  useEffect(() => {
-    localStorage.setItem("watchlist", JSON.stringify(watchlist));
-  }, [watchlist]);
-
-  // unique genres
   const genres = [...new Set(animeMock.flatMap((a) => a.genres))];
 
-  // toggle watchlist handler
-  const toggleWatchlist = (id) => {
-    setWatchlist((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
-    );
-  };
-
-  // filtering logic
   const filteredAnime = animeMock.filter((anime) => {
     const matchesTitle = anime.title
       .toLowerCase()
@@ -88,12 +71,7 @@ function AnimeList() {
       {/* Anime list */}
       <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
         {filteredAnime.map((anime) => (
-          <AnimeCard
-            key={anime.id}
-            anime={anime}
-            isInWatchlist={watchlist.includes(anime.id)}
-            onToggle={toggleWatchlist}
-          />
+          <AnimeCard key={anime.id} anime={anime}/>
         ))}
       </div>
     </div>
