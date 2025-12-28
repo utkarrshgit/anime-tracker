@@ -3,10 +3,9 @@ import animeMock from "../data/animeMock";
 import AnimeCard from "../components/AnimeCard";
 import { useWatchlist } from "../context/WatchlistContext";
 
-function AnimeList() {
+function AnimeList({ watchlistOnly = false }) {
   const [query, setQuery] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
-  const [showWatchlistOnly, setShowWatchlistOnly] = useState(false);
 
   const { watchlist } = useWatchlist();
 
@@ -21,10 +20,9 @@ function AnimeList() {
       selectedGenres.length === 0 ||
       selectedGenres.some((g) => anime.genres.includes(g));
 
-    const matchWatchlist = 
-      !showWatchlistOnly || watchlist.includes(anime.id);
+    const matchesWatchlist = !watchlistOnly || watchlist.includes(anime.id);
 
-    return matchesTitle && matchesGenre && matchWatchlist;
+    return matchesTitle && matchesGenre && matchesWatchlist;
   });
 
   return (
@@ -60,18 +58,10 @@ function AnimeList() {
         ))}
       </div>
 
-      {/* Watchlist toggle */}
-      <button
-        onClick={() => setShowWatchlistOnly((prev) => !prev)}
-        style={{ padding: 8, marginBottom: 16 }}
-      >
-        {showWatchlistOnly ? "Show all" : "Show Watchlist"}
-      </button>
-
       {/* Anime list */}
       <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
         {filteredAnime.map((anime) => (
-          <AnimeCard key={anime.id} anime={anime}/>
+          <AnimeCard key={anime.id} anime={anime} />
         ))}
       </div>
     </div>
