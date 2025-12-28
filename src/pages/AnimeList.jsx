@@ -5,18 +5,19 @@ import { useWatchlist } from "../context/WatchlistContext";
 function AnimeList({ watchlistOnly = false }) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
-
   const [selectedGenres, setSelectedGenres] = useState([]);
+
   const [animeList, setAnimeList] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const [initialLoading, setInitialLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
 
   const { watchlist } = useWatchlist();
 
+  // debounce search
   useEffect(() => {
     const id = setTimeout(() => {
       setDebouncedQuery(query);
@@ -25,6 +26,7 @@ function AnimeList({ watchlistOnly = false }) {
     return () => clearTimeout(id);
   }, [query]);
 
+  // fetch data
   useEffect(() => {
     const isFirstPage = page === 1;
 
@@ -66,6 +68,7 @@ function AnimeList({ watchlistOnly = false }) {
       });
   }, [page]);
 
+  // infinite scroll
   useEffect(() => {
     const handleScroll = () => {
       const nearBottom =
@@ -104,6 +107,9 @@ function AnimeList({ watchlistOnly = false }) {
     return matchesTitle && matchesGenre && matchesWatchlist;
   });
 
+  const noResults = filteredAnime.length === 0;
+  const noWatchlist = watchlistOnly && watchlist.length === 0;
+
   return (
     <div style={{ padding: 20 }}>
       {/* Search */}
@@ -136,6 +142,13 @@ function AnimeList({ watchlistOnly = false }) {
           </label>
         ))}
       </div>
+
+      {/* Empty states */}
+      {noWatchlist && <p style={{ marginTop: 16 }}>Your watchlist is empty.</p>}
+
+      {!noWatchlist && noResults && (
+        <p style={{ marginTop: 16 }}>No anime match your search or filters.</p>
+      )}
 
       {/* Anime list */}
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
