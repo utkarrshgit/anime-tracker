@@ -1,4 +1,5 @@
 import { useWatchlist } from "../context/WatchlistContext";
+import { Link } from "react-router-dom";
 
 function AnimeCard({ anime }) {
   const { watchlist, toggleWatchlist } = useWatchlist();
@@ -6,7 +7,9 @@ function AnimeCard({ anime }) {
 
   return (
     <div style={{ border: "1px solid #ccc", padding: 12, width: 220 }}>
-      <h3>{anime.title}</h3>
+      <h3>
+        <Link to={`/anime/${anime.id}`}>{anime.title}</Link>
+      </h3>
       <p>{anime.genres.join(", ")}</p>
       <p>⭐ {anime.score}</p>
 
