@@ -4,6 +4,7 @@ import { useWatchlist } from "../context/WatchlistContext";
 
 function AnimeList({ watchlistOnly = false }) {
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [animeList, setAnimeList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,6 +12,14 @@ function AnimeList({ watchlistOnly = false }) {
   const [page, setPage] = useState(1);
 
   const { watchlist } = useWatchlist();
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 300);
+
+    return () => clearTimeout(id);
+  }, [query]);
 
   useEffect(() => {
     setLoading(true);
@@ -45,7 +54,7 @@ function AnimeList({ watchlistOnly = false }) {
   const filteredAnime = animeList.filter((anime) => {
     const matchesTitle = anime.title
       .toLowerCase()
-      .includes(query.toLowerCase());
+      .includes(debouncedQuery.toLowerCase());
 
     const matchesGenre =
       selectedGenres.length === 0 ||
