@@ -1,17 +1,45 @@
-import { useState } from "react";
-import animeMock from "../data/animeMock";
+import { useEffect, useState } from "react";
 import AnimeCard from "../components/AnimeCard";
 import { useWatchlist } from "../context/WatchlistContext";
 
 function AnimeList({ watchlistOnly = false }) {
   const [query, setQuery] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [animeList, setAnimeList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const { watchlist } = useWatchlist();
 
-  const genres = [...new Set(animeMock.flatMap((a) => a.genres))];
+  useEffect(() => {
+    fetch("https://api.jikan.moe/v4/anime")
+      .then((res) => {
+        if (!res.ok) throw new Error("Network error");
+        return res.json();
+      })
+      .then((data) => {
+        const formatted = data.data.map((a) => ({
+          id: a.mal_id,
+          title: a.title,
+          genres: a.genres.map((g) => g.name),
+          score: a.score ?? 0,
+        }));
 
-  const filteredAnime = animeMock.filter((anime) => {
+        setAnimeList(formatted);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Failed to load anime data");
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <p style={{ padding: 20 }}>Loading...</p>;
+  if (error) return <p style={{ padding: 20 }}>{error}</p>;
+
+  const genres = [...new Set(animeList.flatMap((a) => a.genres))];
+
+  const filteredAnime = animeList.filter((anime) => {
     const matchesTitle = anime.title
       .toLowerCase()
       .includes(query.toLowerCase());
