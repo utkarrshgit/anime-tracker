@@ -8,11 +8,14 @@ function AnimeList({ watchlistOnly = false }) {
   const [animeList, setAnimeList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
 
   const { watchlist } = useWatchlist();
 
   useEffect(() => {
-    fetch("https://api.jikan.moe/v4/anime")
+    setLoading(true);
+
+    fetch(`https://api.jikan.moe/v4/anime?page=${page}&limit=12`)
       .then((res) => {
         if (!res.ok) throw new Error("Network error");
         return res.json();
@@ -32,7 +35,7 @@ function AnimeList({ watchlistOnly = false }) {
         setError("Failed to load anime data");
         setLoading(false);
       });
-  }, []);
+  }, [page]);
 
   if (loading) return <p style={{ padding: 20 }}>Loading...</p>;
   if (error) return <p style={{ padding: 20 }}>{error}</p>;
@@ -84,6 +87,20 @@ function AnimeList({ watchlistOnly = false }) {
             {g}
           </label>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div style={{ marginBottom: 16 }}>
+        <button
+          onClick={() => setPage((p) => Math.max(p - 1, 1))}
+          disabled={page === 1}
+        >
+          Prev
+        </button>
+
+        <span style={{ margin: "0 12px" }}>Page {page}</span>
+
+        <button onClick={() => setPage((p) => p + 1)}>Next</button>
       </div>
 
       {/* Anime list */}
