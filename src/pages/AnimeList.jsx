@@ -5,11 +5,15 @@ import { useWatchlist } from "../context/WatchlistContext";
 function AnimeList({ watchlistOnly = false }) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
+
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [animeList, setAnimeList] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const { watchlist } = useWatchlist();
 
@@ -22,7 +26,13 @@ function AnimeList({ watchlistOnly = false }) {
   }, [query]);
 
   useEffect(() => {
-    setLoading(true);
+    const isFirstPage = page === 1;
+
+    if (isFirstPage) {
+      setInitialLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
 
     fetch(`https://api.jikan.moe/v4/anime?page=${page}&limit=12`)
       .then((res) => {
@@ -37,16 +47,45 @@ function AnimeList({ watchlistOnly = false }) {
           score: a.score ?? 0,
         }));
 
-        setAnimeList(formatted);
-        setLoading(false);
+        setAnimeList((prev) => {
+          const map = new Map(prev.map((a) => [a.id, a]));
+          formatted.forEach((a) => map.set(a.id, a));
+          return Array.from(map.values());
+        });
+
+        setHasMore(data.pagination.has_next_page);
       })
       .catch(() => {
-        setError("Failed to load anime data");
-        setLoading(false);
+        if (page === 1) {
+          setError("Failed to load anime data");
+        }
+      })
+      .finally(() => {
+        setInitialLoading(false);
+        setLoadingMore(false);
       });
   }, [page]);
 
-  if (loading) return <p style={{ padding: 20 }}>Loading...</p>;
+  useEffect(() => {
+    const handleScroll = () => {
+      const nearBottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
+
+      if (nearBottom && !loadingMore && hasMore) {
+        setPage((p) => p + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loadingMore, hasMore]);
+
+  if (initialLoading && error) {
+    return <p style={{ padding: 20 }}>{error}</p>;
+  }
+  if (initialLoading) {
+    return <p style={{ padding: 20 }}>Loading...</p>;
+  }
   if (error) return <p style={{ padding: 20 }}>{error}</p>;
 
   const genres = [...new Set(animeList.flatMap((a) => a.genres))];
@@ -98,26 +137,16 @@ function AnimeList({ watchlistOnly = false }) {
         ))}
       </div>
 
-      {/* Pagination */}
-      <div style={{ marginBottom: 16 }}>
-        <button
-          onClick={() => setPage((p) => Math.max(p - 1, 1))}
-          disabled={page === 1}
-        >
-          Prev
-        </button>
-
-        <span style={{ margin: "0 12px" }}>Page {page}</span>
-
-        <button onClick={() => setPage((p) => p + 1)}>Next</button>
-      </div>
-
       {/* Anime list */}
-      <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
         {filteredAnime.map((anime) => (
           <AnimeCard key={anime.id} anime={anime} />
         ))}
       </div>
+
+      {/* Bottom indicators */}
+      {loadingMore && <p style={{ marginTop: 16 }}>Loading more...</p>}
+      {!hasMore && <p style={{ marginTop: 16 }}>No more anime</p>}
     </div>
   );
 }
