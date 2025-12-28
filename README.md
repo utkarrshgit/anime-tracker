@@ -108,5 +108,3 @@ src/
 - 🧩 Scalable state management patterns
 - 🧭 Routing and dynamic pages
 - 🐞 Production-style debugging and iteration
-
----
