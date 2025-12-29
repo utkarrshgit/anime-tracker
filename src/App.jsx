@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import { useAuth } from "./context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const { user } = useAuth();
@@ -15,7 +16,14 @@ function App() {
         <Link to="/" style={{ marginRight: 12 }}>
           All Anime
         </Link>
-        <Link to="/watchlist">Watchlist</Link>
+
+        {user ? (
+          <Link to="/watchlist" style={{ marginRight: 12 }}>
+            Watchlist
+          </Link>
+        ) : (
+          <span style={{ marginRight: 12, opacity: 0.5 }}>Watchlist</span>
+        )}
 
         {user ? (
           <button onClick={() => signOut(auth)}>Log out</button>
@@ -26,7 +34,14 @@ function App() {
 
       <Routes>
         <Route path="/" element={<AnimeList />} />
-        <Route path="/watchlist" element={<AnimeList watchlistOnly />} />
+        <Route
+          path="/watchlist"
+          element={
+            <ProtectedRoute>
+              <AnimeList watchlistOnly />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/anime/:id" element={<AnimeDetail />} />
         <Route path="/login" element={<Login />} />
       </Routes>
