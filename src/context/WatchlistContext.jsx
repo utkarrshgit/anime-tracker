@@ -27,7 +27,14 @@ export function WatchlistProvider({ children }) {
       if (snap.exists()) {
         setWatchlist(snap.data().animeIds || []);
       } else {
-        setWatchlist([]);
+        const local = localStorage.getItem("watchlist");
+        const parsed = local ? JSON.parse(local) : [];
+
+        if (parsed.length > 0) {
+          setWatchlist(parsed);
+        } else {
+          setWatchlist([]);
+        }
       }
 
       setHydrated(true);
@@ -42,6 +49,8 @@ export function WatchlistProvider({ children }) {
 
     const ref = doc(db, "watchlists", user.uid);
     setDoc(ref, { animeIds: watchlist });
+
+    localStorage.removeItem("watchlist");
   }, [watchlist, user, hydrated]);
 
   const toggleWatchlist = (id) => {
