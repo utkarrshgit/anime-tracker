@@ -1,20 +1,52 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "./AuthContext";
 
 const WatchlistContext = createContext();
 
 export function WatchlistProvider({ children }) {
-  const [watchlist, setWatchlist] = useState(() => {
-    const saved = localStorage.getItem("watchlist");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { user } = useAuth();
+  const [watchlist, setWatchlist] = useState([]);
+  const [hydrated, setHydrated] = useState(false);
 
+  // Load watchlist when user changes
   useEffect(() => {
-    localStorage.setItem("watchlist", JSON.stringify(watchlist));
-  }, [watchlist]);
+    if (!user) {
+      setWatchlist([]);
+      setHydrated(false);
+      return;
+    }
+
+    setHydrated(false);
+
+    const load = async () => {
+      const ref = doc(db, "watchlists", user.uid);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        setWatchlist(snap.data().animeIds || []);
+      } else {
+        setWatchlist([]);
+      }
+
+      setHydrated(true);
+    };
+
+    load();
+  }, [user]);
+
+  // Save watchlist ONLY after hydration
+  useEffect(() => {
+    if (!user || !hydrated) return;
+
+    const ref = doc(db, "watchlists", user.uid);
+    setDoc(ref, { animeIds: watchlist });
+  }, [watchlist, user, hydrated]);
 
   const toggleWatchlist = (id) => {
     setWatchlist((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 

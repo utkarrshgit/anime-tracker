@@ -24,7 +24,15 @@ function Login() {
       }
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      if (err.code === "auth/invalid-credential") {
+        setError("Invalid email or password.");
+      } if (err.code === "auth/email-already-in-use") {
+				setError("Email already in use.");
+      } if (err.code === "auth/invalid-email") {
+				setError("Invalid email.");
+      } else {
+        setError(err.message);
+      }
     }
   };
 
