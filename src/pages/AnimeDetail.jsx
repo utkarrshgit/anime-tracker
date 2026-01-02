@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useWatchlist } from "../context/WatchlistContext";
 import "./AnimeDetail.css";
+import CollapsibleSection from "../components/CollapsibleSection";
 
 function AnimeDetail() {
   const { id } = useParams();
@@ -141,28 +142,22 @@ function AnimeDetail() {
         </p>
       )}
 
-      {characters.length > 0 && (
-        <section className="anime-characters">
-          <h2>Characters</h2>
+      <CollapsibleSection title="Characters">
+        <div className="character-grid">
+          {characters.map((c) => (
+            <div key={c.id} className="character-card">
+              {c.image && <img src={c.image} alt={c.name} />}
+              <p className="character-name">{c.name}</p>
+              <p className="character-role">{c.role}</p>
 
-          <div className="character-grid">
-            {characters.map((c) => (
-              <div key={c.id} className="character-card">
-                {c.image && <img src={c.image} alt={c.name} />}
-                <p className="character-name">{c.name}</p>
-                <p className="character-role">{c.role}</p>
+              {c.jpVA && <p className="va">🇯🇵 {c.jpVA.name}</p>}
+              {c.enVA && <p className="va">🇺🇸 {c.enVA.name}</p>}
+            </div>
+          ))}
+        </div>
+      </CollapsibleSection>
 
-                {c.jpVA && <p className="va">🇯🇵 {c.jpVA.name}</p>}
-                {c.enVA && <p className="va">🇺🇸 {c.enVA.name}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section className="anime-episodes">
-        <h2>Episodes</h2>
-
+      <CollapsibleSection title="Episodes">
         <ul className="episode-list">
           {episodes.map((ep) => (
             <li key={ep.id} className="episode-item">
@@ -181,7 +176,7 @@ function AnimeDetail() {
             Load more
           </button>
         )}
-      </section>
+      </CollapsibleSection>
       
     </div>
   );
