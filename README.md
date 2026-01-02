@@ -8,26 +8,30 @@ A modern anime browsing web app with search, filters, infinite scroll, watchlist
 
 ## ✨ Features
 
-- 📜 Browse anime with **infinite scroll**
-- 🔍 **Debounced search** by title
-- 🏷️ **Multi-genre filtering**
-- ⭐ **Watchlist** (persistent via localStorage)
-- 📌 Dedicated **Watchlist view**
-- 📄 **Anime detail pages** (`/anime/:id`)
+- 🔍 Browse anime with infinite scroll
+- ⏱️ Debounced search by title
+- 🏷️ Multi-genre filtering
+- 🔐 User authentication (Email/Password & Google)
+- ⭐ Personal watchlist per user
+- ☁️ Watchlist persisted with Firestore
+- 📌 Dedicated Watchlist view (protected)
+- 📄 Anime detail pages (`/anime/:id`)
 - 🧭 Client-side routing
-- 🚦 Graceful handling of API rate limits
-- 🧼 Clean empty and loading states
+- ⚠️ Graceful handling of API rate limits
+- 🧼 Clean loading and empty states
 
 ---
 
 ## 🛠️ Tech Stack
 
-- ⚛️ **Frontend:** React (Vite)
-- 🧭 **Routing:** React Router
-- 🧠 **State Management:** React Context
-- 📡 **Data Source:** Jikan API (MyAnimeList)
-- 🎨 **Styling:** Inline CSS (minimal, functional)
-- 💾 **Persistence:** localStorage
+- ⚛️ Frontend: React (Vite)
+- 🧭 Routing: React Router
+- 🧠 State Management: React Context
+- 🔐 Authentication: Firebase Auth
+- ☁️ Database: Firestore
+- 🌐 Data Source: Jikan API (MyAnimeList)
+- 🎨 Styling: Minimal inline CSS
+- 🚀 Hosting: Vercel
 
 ---
 
@@ -94,11 +98,10 @@ src/
 
 ## 🗺️ Roadmap
 
-- 🔐 Backend with authentication
-- ☁️ Persist watchlist per user
-- 🚦 API proxy & caching
-- 👀 IntersectionObserver for smoother infinite scroll
-- 🌙 UI polish (dark mode, skeleton loaders)
+- One-time localStorage → Firestore migration ✅
+- UX polish and performance improvements
+- Optional backend with custom API
+- UI enhancements (dark mode, skeleton loaders)
 
 ---
 
@@ -111,3 +114,13 @@ This project demonstrates:<br>
 - 🧩 Scalable state management patterns
 - 🧭 Routing and dynamic pages
 - 🐞 Production-style debugging and iteration
+
+---
+
+## 📦 Versions
+
+- **v1.0-frontend**  
+  Core frontend with routing, infinite scroll, filters, and local watchlist
+
+- **v1.1-auth-firestore**  
+  Added authentication and persistent per-user watchlist using Firebase
