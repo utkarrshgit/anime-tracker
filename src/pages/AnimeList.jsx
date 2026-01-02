@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AnimeCard from "../components/AnimeCard";
+import "./AnimeList.css";
 
 function AnimeList() {
   const [query, setQuery] = useState("");
@@ -145,7 +146,7 @@ function AnimeList() {
       )}
 
       {/* Anime list */}
-      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+      <div className="anime-grid">
         {filteredAnime.map((anime) => (
           <AnimeCard key={anime.id} anime={anime} />
         ))}
