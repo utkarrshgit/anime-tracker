@@ -96,15 +96,6 @@ src/
 
 ---
 
-## 🗺️ Roadmap
-
-- One-time localStorage → Firestore migration ✅
-- UX polish and performance improvements
-- Optional backend with custom API
-- UI enhancements (dark mode, skeleton loaders)
-
----
-
 ## 💡 Why This Project
 
 This project demonstrates:<br>
@@ -120,7 +111,16 @@ This project demonstrates:<br>
 ## 📦 Versions
 
 - **v1.0-frontend**  
-  Core frontend with routing, infinite scroll, filters, and local watchlist
+  Core browsing experience with routing and infinite scroll
 
 - **v1.1-auth-firestore**  
-  Added authentication and persistent per-user watchlist using Firebase
+  Authentication and persistent per-user watchlist
+
+- **v1.2-watchlist-architecture**  
+  Dedicated watchlist page with ID-based fetching
+
+- **v1.3-structural-ui**  
+  Responsive grid layout and layout container
+
+- **v1.4-feature-complete**  
+  Anime details enriched with characters, voice actors, trailers, and episodes
