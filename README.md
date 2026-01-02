@@ -1,7 +1,7 @@
 # 🎌 Anime Tracker
 
 A modern anime browsing web app with search, filters, infinite scroll, watchlist, and detailed anime pages — built with **React** and a real public API.
-<br>
+<br><br>
 🔗 Live Demo: `https://anime-tracker-sigma.vercel.app`
 
 ---
@@ -118,9 +118,6 @@ This project demonstrates:<br>
 
 - **v1.2-watchlist-architecture**  
   Dedicated watchlist page with ID-based fetching
-
-- **v1.3-structural-ui**  
-  Responsive grid layout and layout container
 
 - **v1.4-feature-complete**  
   Anime details enriched with characters, voice actors, trailers, and episodes
