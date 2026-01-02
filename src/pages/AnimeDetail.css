@@ -1,0 +1,26 @@
+.anime-detail {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.anime-detail__poster img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.anime-detail__info h1 {
+  margin-top: 0;
+}
+
+.anime-detail__synopsis {
+  line-height: 1.6;
+  max-width: 800px;
+}
+
+@media (max-width: 640px) {
+  .anime-detail {
+    grid-template-columns: 1fr;
+  }
+}

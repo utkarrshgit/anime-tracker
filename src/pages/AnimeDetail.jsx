@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useWatchlist } from "../context/WatchlistContext";
+import "./AnimeDetail.css";
 
 function AnimeDetail() {
   const { id } = useParams();
@@ -23,6 +24,7 @@ function AnimeDetail() {
           title: a.title,
           genres: a.genres.map((g) => g.name),
           score: a.score ?? 0,
+          image: a.images?.jpg?.image_url,
           synopsis: a.synopsis ?? "No synopsis available.",
         });
         setLoading(false);
@@ -39,22 +41,23 @@ function AnimeDetail() {
   const isInWatchlist = watchlist.includes(anime.id);
 
   return (
-    <div style={{ padding: 20 }}>
-      <Link to="/">← Back</Link>
+    <div className="app-container">
+      <div className="anime-detail">
+        <div className="anime-detail__poster">
+          <img src={anime.image} alt={anime.title} />
+        </div>
 
-      <h1>{anime.title}</h1>
-      <p>
-        <strong>Genres:</strong> {anime.genres.join(", ")}
-      </p>
-      <p>
-        <strong>Score:</strong> ⭐ {anime.score}
-      </p>
+        <div className="anime-detail__info">
+          <h1>{anime.title}</h1>
+          <p>⭐ {anime.score}</p>
+          <p>{anime.genres.join(", ")}</p>
+          <button onClick={() => toggleWatchlist(anime.id)}>
+            {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+          </button>
+        </div>
+      </div>
 
-      <button onClick={() => toggleWatchlist(anime.id)}>
-        {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
-      </button>
-
-      <p style={{ marginTop: 16 }}>{anime.synopsis}</p>
+      <p className="anime-detail__synopsis">{anime.synopsis}</p>
     </div>
   );
 }
