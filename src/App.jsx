@@ -6,6 +6,7 @@ import { useAuth } from "./context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Watchlist from "./pages/Watchlist";
 
 function App() {
   const { user } = useAuth();
@@ -38,7 +39,7 @@ function App() {
           path="/watchlist"
           element={
             <ProtectedRoute>
-              <AnimeList watchlistOnly />
+              <Watchlist />
             </ProtectedRoute>
           }
         />
