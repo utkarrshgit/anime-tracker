@@ -2,7 +2,7 @@ import { useWatchlist } from "../context/WatchlistContext";
 import { Link } from "react-router-dom";
 
 function AnimeCard({ anime }) {
-  const { watchlist, toggleWatchlist } = useWatchlist();
+  const { watchlist, toggleWatchlist, hydrated, saving } = useWatchlist();
   const isInWatchlist = watchlist.includes(anime.id);
 
   return (
@@ -13,8 +13,15 @@ function AnimeCard({ anime }) {
       <p>{anime.genres.join(", ")}</p>
       <p>⭐ {anime.score}</p>
 
-      <button onClick={() => toggleWatchlist(anime.id)}>
-        {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+      <button
+        onClick={() => toggleWatchlist(anime.id)}
+        disabled={!hydrated || saving}
+        style={{
+          opacity: hydrated && !saving ? 1 : 0.5,
+          cursor: hydrated && !saving ? "pointer" : "not-allowed",
+        }}
+      >
+        {saving ? "Saving…" : isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
       </button>
     </div>
   );

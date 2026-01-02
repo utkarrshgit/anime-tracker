@@ -9,6 +9,7 @@ export function WatchlistProvider({ children }) {
   const { user } = useAuth();
   const [watchlist, setWatchlist] = useState([]);
   const [hydrated, setHydrated] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Load watchlist when user changes
   useEffect(() => {
@@ -47,10 +48,14 @@ export function WatchlistProvider({ children }) {
   useEffect(() => {
     if (!user || !hydrated) return;
 
-    const ref = doc(db, "watchlists", user.uid);
-    setDoc(ref, { animeIds: watchlist });
+    const save = async () => {
+      setSaving(true);
+      const ref = doc(db, "watchlists", user.uid);
+      await setDoc(ref, { animeIds: watchlist });
+      setSaving(false);
+    };
 
-    localStorage.removeItem("watchlist");
+    save();
   }, [watchlist, user, hydrated]);
 
   const toggleWatchlist = (id) => {
@@ -60,7 +65,7 @@ export function WatchlistProvider({ children }) {
   };
 
   return (
-    <WatchlistContext.Provider value={{ watchlist, toggleWatchlist }}>
+    <WatchlistContext.Provider value={{ watchlist, toggleWatchlist, hydrated, saving }}>
       {children}
     </WatchlistContext.Provider>
   );

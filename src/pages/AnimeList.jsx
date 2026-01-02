@@ -15,7 +15,7 @@ function AnimeList({ watchlistOnly = false }) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
 
-  const { watchlist } = useWatchlist();
+  const { watchlist, hydrated } = useWatchlist();
 
   // debounce search
   useEffect(() => {
@@ -148,6 +148,11 @@ function AnimeList({ watchlistOnly = false }) {
 
       {!noWatchlist && noResults && (
         <p style={{ marginTop: 16 }}>No anime match your search or filters.</p>
+      )}
+
+      {/* hydration hint */}
+      {!hydrated && (
+        <p style={{ fontSize: 14, opacity: 0.6 }}>Syncing watchlist…</p>
       )}
 
       {/* Anime list */}
