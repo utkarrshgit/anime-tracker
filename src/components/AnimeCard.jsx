@@ -1,28 +1,37 @@
-import { useWatchlist } from "../context/WatchlistContext";
 import { Link } from "react-router-dom";
+import { useWatchlist } from "../context/WatchlistContext";
+import "./AnimeCard.css"
 
 function AnimeCard({ anime }) {
   const { watchlist, toggleWatchlist, hydrated, saving } = useWatchlist();
   const isInWatchlist = watchlist.includes(anime.id);
 
   return (
-    <div style={{ border: "1px solid #ccc", padding: 12, width: 220 }}>
-      <h3>
-        <Link to={`/anime/${anime.id}`}>{anime.title}</Link>
-      </h3>
-      <p>{anime.genres.join(", ")}</p>
-      <p>⭐ {anime.score}</p>
+    <div className="anime-card">
+      <Link to={`/anime/${anime.id}`} className="anime-card__image-wrapper">
+        <img
+          src={anime.image}
+          alt={anime.title}
+          className="anime-card__image"
+          loading="lazy"
+        />
+        <div className="anime-card__score">★ {anime.score}</div>
+      </Link>
 
-      <button
-        onClick={() => toggleWatchlist(anime.id)}
-        disabled={!hydrated || saving}
-        style={{
-          opacity: hydrated && !saving ? 1 : 0.5,
-          cursor: hydrated && !saving ? "pointer" : "not-allowed",
-        }}
-      >
-        {saving ? "Saving…" : isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
-      </button>
+      <div className="anime-card__content">
+        <h3 className="anime-card__title">{anime.title}</h3>
+        <p className="anime-card__genres">
+          {anime.genres.slice(0, 3).join(", ")}
+        </p>
+
+        <button
+          className={`anime-card__btn ${isInWatchlist ? "remove" : "add"}`}
+          onClick={() => toggleWatchlist(anime.id)}
+          disabled={!hydrated || saving}
+        >
+          {saving ? "Saving…" : isInWatchlist ? "Remove" : "Add to Watchlist"}
+        </button>
+      </div>
     </div>
   );
 }
