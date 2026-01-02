@@ -44,6 +44,7 @@ function AnimeList() {
           title: a.title,
           genres: a.genres.map((g) => g.name),
           score: a.score ?? 0,
+          image: a.images?.jpg?.image_url,
         }));
 
         setAnimeList((prev) => {

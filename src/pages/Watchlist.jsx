@@ -29,7 +29,16 @@ function Watchlist() {
                 if (!r.ok) throw new Error("fetch failed");
                 return r.json();
               })
-              .then((j) => j.data)
+              .then((j) => {
+                const a = j.data;
+                return {
+                  id: a.mal_id,
+                  title: a.title,
+                  genres: a.genres.map((g) => g.name),
+                  score: a.score ?? 0,
+                  image: a.images?.jpg?.image_url,
+                };
+              })
           )
         );
 
