@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import AnimeCard from "../components/AnimeCard";
-import { useWatchlist } from "../context/WatchlistContext";
 
-function AnimeList({ watchlistOnly = false }) {
+function AnimeList() {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -14,8 +13,6 @@ function AnimeList({ watchlistOnly = false }) {
   const [initialLoading, setInitialLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
-
-  const { watchlist, hydrated } = useWatchlist();
 
   // debounce search
   useEffect(() => {
@@ -93,6 +90,7 @@ function AnimeList({ watchlistOnly = false }) {
 
   const genres = [...new Set(animeList.flatMap((a) => a.genres))];
 
+  // filtering logic
   const filteredAnime = animeList.filter((anime) => {
     const matchesTitle = anime.title
       .toLowerCase()
@@ -102,13 +100,10 @@ function AnimeList({ watchlistOnly = false }) {
       selectedGenres.length === 0 ||
       selectedGenres.some((g) => anime.genres.includes(g));
 
-    const matchesWatchlist = !watchlistOnly || watchlist.includes(anime.id);
-
-    return matchesTitle && matchesGenre && matchesWatchlist;
+    return matchesTitle && matchesGenre;
   });
 
   const noResults = filteredAnime.length === 0;
-  const noWatchlist = watchlistOnly && watchlist.length === 0;
 
   return (
     <div style={{ padding: 20 }}>
@@ -144,15 +139,8 @@ function AnimeList({ watchlistOnly = false }) {
       </div>
 
       {/* Empty states */}
-      {noWatchlist && <p style={{ marginTop: 16 }}>Your watchlist is empty.</p>}
-
-      {!noWatchlist && noResults && (
+      {noResults && (
         <p style={{ marginTop: 16 }}>No anime match your search or filters.</p>
-      )}
-
-      {/* hydration hint */}
-      {!hydrated && (
-        <p style={{ fontSize: 14, opacity: 0.6 }}>Syncing watchlist…</p>
       )}
 
       {/* Anime list */}
