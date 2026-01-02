@@ -56,3 +56,25 @@
   font-size: 12px;
   margin-top: 4px;
 }
+
+.anime-episodes {
+  margin-top: 32px;
+}
+
+.episode-list {
+  list-style: none;
+  padding: 0;
+}
+
+.episode-item {
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.episode-item a {
+  text-decoration: none;
+}
+
+.episode-item a:hover {
+  text-decoration: underline;
+}

@@ -12,6 +12,11 @@ function AnimeDetail() {
   const [error, setError] = useState(null);
   const [characters, setCharacters] = useState([]);
 
+  const [episodes, setEpisodes] = useState([]);
+  const [episodePage, setEpisodePage] = useState(1);
+  const [hasMoreEpisodes, setHasMoreEpisodes] = useState(true);
+  const [loadingEpisodes, setLoadingEpisodes] = useState(false);
+
   useEffect(() => {
     fetch(`https://api.jikan.moe/v4/anime/${id}`)
       .then((res) => {
@@ -72,6 +77,38 @@ function AnimeDetail() {
       });
   }, [id]);
 
+  useEffect(() => {
+    setEpisodes([]);
+    setEpisodePage(1);
+    setHasMoreEpisodes(true);
+  }, [id]);
+
+  useEffect(() => {
+    if (!hasMoreEpisodes) return;
+
+    setLoadingEpisodes(true);
+
+    fetch(`https://api.jikan.moe/v4/anime/${id}/episodes?page=${episodePage}`)
+      .then((res) => res.json())
+      .then(({ data, pagination }) => {
+        const formatted = data.map((e) => ({
+          id: e.mal_id,
+          number: e.mal_id,
+          title: e.title || `Episode ${e.mal_id}`,
+          url: e.url,
+        }));
+
+        setEpisodes((prev) => [...prev, ...formatted]);
+        setHasMoreEpisodes(pagination.has_next_page);
+      })
+      .catch(() => {
+        setHasMoreEpisodes(false);
+      })
+      .finally(() => {
+        setLoadingEpisodes(false);
+      });
+  }, [id, episodePage]);
+
   if (loading) return <p style={{ padding: 20 }}>Loading...</p>;
   if (error) return <p style={{ padding: 20 }}>{error}</p>;
 
@@ -122,6 +159,29 @@ function AnimeDetail() {
           </div>
         </section>
       )}
+
+      <section className="anime-episodes">
+        <h2>Episodes</h2>
+
+        <ul className="episode-list">
+          {episodes.map((ep) => (
+            <li key={ep.id} className="episode-item">
+              <span>Episode {ep.number}</span>{" "}
+              <a href={ep.url} target="_blank" rel="noopener noreferrer">
+                {ep.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        {loadingEpisodes && <p>Loading episodes…</p>}
+
+        {hasMoreEpisodes && !loadingEpisodes && (
+          <button onClick={() => setEpisodePage((p) => p + 1)}>
+            Load more
+          </button>
+        )}
+      </section>
       
     </div>
   );
