@@ -10,6 +10,7 @@ function AnimeDetail() {
   const [anime, setAnime] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [characters, setCharacters] = useState([]);
 
   useEffect(() => {
     fetch(`https://api.jikan.moe/v4/anime/${id}`)
@@ -26,12 +27,48 @@ function AnimeDetail() {
           score: a.score ?? 0,
           image: a.images?.jpg?.image_url,
           synopsis: a.synopsis ?? "No synopsis available.",
+          trailer: a.trailer?.url ?? null,
         });
         setLoading(false);
       })
       .catch(() => {
         setError("Failed to load anime");
         setLoading(false);
+      });
+  }, [id]);
+
+  useEffect(() => {
+    fetch(`https://api.jikan.moe/v4/anime/${id}/characters`)
+      .then((res) => res.json())
+      .then(({ data }) => {
+        const formatted = data.map((c) => {
+          const jpVA = c.voice_actors.find((va) => va.language === "Japanese");
+          const enVA = c.voice_actors.find((va) => va.language === "English");
+
+          return {
+            id: c.character.mal_id,
+            name: c.character.name,
+            image: c.character.images?.jpg?.image_url,
+            role: c.role,
+            jpVA: jpVA
+              ? {
+                  name: jpVA.person.name,
+                  image: jpVA.person.images?.jpg?.image_url,
+                }
+              : null,
+            enVA: enVA
+              ? {
+                  name: enVA.person.name,
+                  image: enVA.person.images?.jpg?.image_url,
+                }
+              : null,
+          };
+        });
+
+        setCharacters(formatted);
+      })
+      .catch(() => {
+        setCharacters([]);
       });
   }, [id]);
 
@@ -58,6 +95,34 @@ function AnimeDetail() {
       </div>
 
       <p className="anime-detail__synopsis">{anime.synopsis}</p>
+
+      {anime.trailer && (
+        <p>
+          <a href={anime.trailer} target="_blank" rel="noopener noreferrer">
+            ▶ Watch Trailer
+          </a>
+        </p>
+      )}
+
+      {characters.length > 0 && (
+        <section className="anime-characters">
+          <h2>Characters</h2>
+
+          <div className="character-grid">
+            {characters.map((c) => (
+              <div key={c.id} className="character-card">
+                {c.image && <img src={c.image} alt={c.name} />}
+                <p className="character-name">{c.name}</p>
+                <p className="character-role">{c.role}</p>
+
+                {c.jpVA && <p className="va">🇯🇵 {c.jpVA.name}</p>}
+                {c.enVA && <p className="va">🇺🇸 {c.enVA.name}</p>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+      
     </div>
   );
 }
