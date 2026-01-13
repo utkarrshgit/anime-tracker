@@ -66,16 +66,7 @@ function Watchlist() {
       <h2>Your Watchlist</h2>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
         {anime.map((a) => (
-          <AnimeCard
-            key={a.mal_id}
-            anime={{
-              id: a.mal_id,
-              title: a.title,
-              genres: a.genres.map((g) => g.name),
-              score: a.score ?? 0,
-              image: a.images?.jpg?.image_url,
-            }}
-          />
+          <AnimeCard key={a.id} anime={a} />
         ))}
       </div>
     </div>
